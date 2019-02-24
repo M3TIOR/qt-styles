@@ -1,0 +1,29 @@
+{
+  "name": "qt-styles",
+  "version": "0.0.1",
+  "description": "All M3TIOR's system wide Qt styles",
+  "scripts": {
+    "build": "package(){ mkdir -p dist; lessc $1/qt.less > dist/$1.qss; }; package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m3tior/qt-styles.git"
+  },
+  "keywords": [
+    "qt4",
+    "qt5",
+    "styles",
+    "css",
+    "less",
+    "qss"
+  ],
+  "author": "Ruby Allison Rose (aka: M3TIOR)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/m3tior/qt-styles/issues"
+  },
+  "homepage": "https://github.com/m3tior/qt-styles#readme",
+  "dependencies": {
+    "less": "^3.9.0"
+  }
+}

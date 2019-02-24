@@ -1,0 +1,63 @@
+/**
+ * qt.less
+ * ----------------------------------------------------------------------------
+ * System wide UI theme for QT-5 based applications.
+ *
+ *
+ * @version 1.0.0 (2/22/2019)
+ * @license MIT
+ * @copyright (c) 2019 Ruby Allison Rose (aka: M3TIOR)
+ * (https://m3tior.github.io)
+ * ============================================================================
+ */
+
+@import "colors.less";
+
+QAbstractItemView{
+	alternate-background-color: @base-background-color;
+}
+
+QWidget {
+	background: @app-background-color;
+	color: @bright-active;
+}
+
+QMainWindow {
+	/* Style the widget separators here. */
+}
+
+QTreeView {
+	/* Each item extends the length of its row */
+	show-decoration-selected: 1;
+
+	&::item{
+		color: @alt-color;
+
+		&:hover{
+			background-color: @tree-view-item-background-color-hover;
+		    color: @alt-color;
+		}
+
+		&:selected{
+			background: @tree-view-item-background-color-selected;
+			box-shadow: inset -1px  0   0 0 @base-border-color,
+	                    inset  0   -4px 0 0 @primary-color,
+	                    inset  0   -5px 0 0 @base-border-color,
+	                           0    1px 0 0 @base-border-color,
+	                           0   -1px 0 0 @base-border-color;
+	        //right: 0;
+	        //z-index: 1;
+
+			&:hover{
+				color: @alt-color-highlight;
+				background: @tree-view-item-background-color-selected-hover;
+			    box-shadow:        0    1px 0 0 @base-border-color,
+			                       0   -1px 0 0 @base-border-color,
+			                inset -1px  0   0 0 @base-border-color,
+			                inset  0   -4px 0 0 @primary-color-hover,
+			                inset  0   -5px 0 0 @base-border-color;
+				//right: 0;
+			}
+		}
+	}
+}
