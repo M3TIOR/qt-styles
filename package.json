@@ -1,9 +1,11 @@
 {
   "name": "qt-styles",
   "version": "0.0.1",
-  "description": "All M3TIOR's system wide Qt styles",
+  "description": "All of M3TIOR's system wide Qt styles",
   "scripts": {
-    "build": "package(){ mkdir -p dist; lessc $1/qt.less > dist/$1.qss; }; package"
+    "deploy": "webpack --mode production --env.mode='production'",
+    "build": "webpack --mode development --env.mode='development'",
+	"live-preview": "webpack --mode development --env.mode='development' --watch"
   },
   "repository": {
     "type": "git",
@@ -23,7 +25,12 @@
     "url": "https://github.com/m3tior/qt-styles/issues"
   },
   "homepage": "https://github.com/m3tior/qt-styles#readme",
-  "dependencies": {
-    "less": "^3.9.0"
+  "dev-dependencies": {
+    "inert-entry-webpack-plugin": "^4.0.2",
+    "less": "^3.9.0",
+    "webpack": "^4.29.6",
+	"css-loader": "^2.1.1",
+	"less-loader": "^4.1.0",
+	"extract-loader": "^3.1.0"
   }
 }
