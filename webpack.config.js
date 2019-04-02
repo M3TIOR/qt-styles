@@ -21,8 +21,56 @@ const InertEntryPlugin = require('inert-entry-webpack-plugin');
 const webpack = require('webpack');
 
 // Standard Library Requirements
+const subprocess = require('child_process');
 const path = require('path');
 const fs = require('fs');
+
+
+function TesterBootstrap(options) {
+  var defaultOptions = { live: "", outputPath: __dirname };
+
+  this.options = Object.assign(defaultOptions, options);
+}
+
+TesterBootstrap.prototype.apply = function(compiler) {
+	let name = "style-test-bootstrap";
+  let options = this.options;
+	let outputPath = options.outputPath;
+	let liveEditorInstance = null;
+
+	// WOOOT WOOOT FOR WEBPACK 4.0 PLUGIN API!!!
+	// Still lovin' tappable
+
+	compiler.hooks.done.tap(name, (stats) =>{
+		Object.keys(stats.compilation.assets).forEach( (project) => {
+			if (path.basename(project, ".qss") == JSON.parse(options.live)){
+				let command = "pyside2-style-test";
+				let commandOpts = { stdio: "inherit" };
+				let args = [
+					"--file", path.join(outputPath, project)
+				];
+
+				// just in case this is called multiple times
+				if (!liveEditorInstance){
+					liveEditorInstance = subprocess.execFile(command, args, commandOpts);
+
+					// register the child program needs to close when we do.
+					process.on('SIGINT', ()=>liveEditorInstance.kill("SIGKILL"));
+				}
+			}
+		});
+
+		if (!liveEditorInstance && options.live) {
+			console.warn(`Couldn't find project ${options.live}.`)
+			process.exit(-1);
+		}
+	});
+
+	// Can't access this for now. Found a workaround using process.on
+	/*compiler.hooks.watchClose.tap(name, () => {
+		if (liveEditorInstance) liveEditorinstance.kill()
+	});*/
+};
 
 module.exports = (env) => {
 	let outputPath = path.resolve(__dirname, "dist");
@@ -35,7 +83,7 @@ module.exports = (env) => {
 	return {
 		mode: env.mode,
 		cache: false, // never cache, otherwise it will kill effectiveness of watch mode
-		//watch: env.watch, // make sure to await file updates when previewing. (switched to cli option)
+		watch: (env.liveEdit? true : false), // make sure to await file updates when previewing.
 		//stats: "verbose",
 
 		entry: () => {
@@ -43,7 +91,7 @@ module.exports = (env) => {
 
 			/* Loop through all the folders in the current directory with file types
 			 * because we need to know which ones are directories */
-			fs.readdirSync(".", { withFileTypes: true }).forEach( (directory) => {
+			fs.readdirSync(__dirname, { withFileTypes: true }).forEach( (directory) => {
 				if ( // Exclude...
 					! directory.isDirectory() // hidden folders,
 					|| directory.name.startsWith(".") // files,
@@ -62,7 +110,7 @@ module.exports = (env) => {
 				if ( entry === null ){
 					// helpfull warning for other contributors
 					console.warn("".concat(
-						"Suppressing possible entry point ",directory.name," could not ",
+						"Suppressing possible entry point '",directory.name,"' could not ",
 						"locate initalizer file 'qt.(less|css|...)'.\nWas this intentional?"
 					));
 				}
@@ -99,7 +147,11 @@ module.exports = (env) => {
 
 		plugins: [
 			/* Allows us to use non-js entry-points */
-			new InertEntryPlugin()
+			new InertEntryPlugin(),
+			new TesterBootstrap({
+				live: env.liveEdit,
+				outputPath: outputPath
+			})
 		],
 
 		optimization: {
