@@ -6,7 +6,16 @@ stylesheets as system-wide themes. So if I wanted to make that happen, I'd most 
 build a plugin to Qt. Or I could make a fork of Qt and add that system in myself with the latter
 being the harder to maintain of the two.
 
-Each individual *theme*'s stylesheet will be authored within a container folder bearing the same name as the finalized style. I do plan on authoring styles based on other's theme submissions, for which I will ensure to designate proper credit to the theme's original creators in their respective stylesheet's README file. If any source code is included with a theme I am basing my QT version off of, I may include substantial portions of said source code within mine. If that is the case, I'll include the appropriate open source licensing within the container folder as well and, where applicable, annotations to the external licenses that the copied source applies to.
+Each individual *theme*'s stylesheet will be authored within a container folder bearing the same name as the finalized style.
+
+### Licensing
+
+This project is licensed under an MIT license. Said license can be found in the root
+of the repository. A license disclaimer should be provided with every source file authored
+within this repository, although if things slip through the cracks I'll be sure to clean
+them up on the double.
+
+I do plan on authoring styles based on other's theme submissions, for which I will ensure to designate proper credit to the theme's original creators in their respective stylesheet's README file. If any source code is included with a theme I am basing my QT version off of, I may include substantial portions of said source code within mine. If that is the case, I'll include the appropriate open source licensing within the container folder as well and, where applicable, annotations to the external licenses that the copied source applies to.
 
 ### Usage
 
