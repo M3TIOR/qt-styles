@@ -34,7 +34,7 @@ function sleep(n) {
 }
 
 function TesterBootstrap(options) {
-  var defaultOptions = { live: "", outputPath: __dirname };
+  var defaultOptions = { live: null, outputPath: __dirname };
 
   this.options = Object.assign(defaultOptions, options);
 }
@@ -49,7 +49,7 @@ TesterBootstrap.prototype.apply = function(compiler) {
 	// Still lovin' tappable
 
 	compiler.hooks.done.tap(name, (stats) =>{
-		if (Object.keys(stats.compilation.assets).length > 0){
+		if (Object.keys(stats.compilation.assets).length > 0 && options.live !== undefined){
 			// I didn't think I needed this if block before but as it turns out I
 			// do because otherwise, the exit call implemented within this
 			// block will prevent webpack errors from being output to stdin when
@@ -74,7 +74,7 @@ TesterBootstrap.prototype.apply = function(compiler) {
 				}
 			});
 
-			if (!liveEditorInstance && options.live) {
+			if (!liveEditorInstance) {
 				console.warn(`Couldn't find project ${options.live}.`)
 				process.exit(-1);
 			}

@@ -30,11 +30,12 @@ parser.addArgument(['--live'],{
 let args = parser.parseArgs()
 
 let command = 'webpack';
-let commandArgs = [
-	'--env.mode=' + (args.P ? 'production' : 'development'),
+let commandArgs = [];
 
-	'--env.liveEdit=' + JSON.stringify(args.live),
-];
+commandArgs.push('--env.mode=' + (args.P ? 'production' : 'development'))
+
+if (args.live)
+	commandArgs.push('--env.liveEdit=' + JSON.stringify(args.live));
 
 /**
  * Spawn webpack and redirect it's output stream to inherit this one so we can
