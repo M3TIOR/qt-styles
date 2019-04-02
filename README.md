@@ -18,7 +18,7 @@ as you like.
 
 Each project contained in this container will be in one of these statuses:
  1. ![Status terminated](https://img.shields.io/badge/Status-terminated-darkred.svg)
- 2. ![Status on hiatus](https://img.shields.io/badge/Status-on hiatus-darkorange.svg)
+ 2. ![Status on hiatus](https://img.shields.io/badge/Status-hiatus-darkorange.svg)
  3. ![Status idea](https://img.shields.io/badge/Status-idea-darkblue.svg)
  4. ![status WIP](https://img.shields.io/badge/Status-WIP-yellowgreen.svg)
  5. ![Status completed](https://img.shields.io/badge/Status-completed-darkgreen.svg)
