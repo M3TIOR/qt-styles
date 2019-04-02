@@ -26,6 +26,13 @@ const path = require('path');
 const fs = require('fs');
 
 
+function msleep(n) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
+}
+function sleep(n) {
+  msleep(n*1000);
+}
+
 function TesterBootstrap(options) {
   var defaultOptions = { live: "", outputPath: __dirname };
 
@@ -42,27 +49,35 @@ TesterBootstrap.prototype.apply = function(compiler) {
 	// Still lovin' tappable
 
 	compiler.hooks.done.tap(name, (stats) =>{
-		Object.keys(stats.compilation.assets).forEach( (project) => {
-			if (path.basename(project, ".qss") == JSON.parse(options.live)){
-				let command = "pyside2-style-test";
-				let commandOpts = { stdio: "inherit" };
-				let args = [
-					"--file", path.join(outputPath, project)
-				];
+		if (Object.keys(stats.compilation.assets).length > 0){
+			// I didn't think I needed this if block before but as it turns out I
+			// do because otherwise, the exit call implemented within this
+			// block will prevent webpack errors from being output to stdin when
+			// they're our assets from being loaded properly.
 
-				// just in case this is called multiple times
-				if (!liveEditorInstance){
-					liveEditorInstance = subprocess.execFile(command, args, commandOpts);
+			Object.keys(stats.compilation.assets).forEach( (project) => {
+				if (path.basename(project, ".qss") == JSON.parse(options.live)){
+					let command = "pyside2-style-test";
+					let commandOpts = { stdio: "inherit" };
+					let args = [
+						"--file", path.join(outputPath, project)
+					];
 
-					// register the child program needs to close when we do.
-					process.on('SIGINT', ()=>liveEditorInstance.kill("SIGKILL"));
+					// just in case this is called multiple times
+					if (!liveEditorInstance){
+						liveEditorInstance = subprocess.execFile(command, args, commandOpts);
+						//sleep(3); // make sure we give the editor enough time to start up
+
+						// register the child program needs to close when this one does.
+						process.on('SIGINT', ()=>liveEditorInstance.kill("SIGKILL"));
+					}
 				}
-			}
-		});
+			});
 
-		if (!liveEditorInstance && options.live) {
-			console.warn(`Couldn't find project ${options.live}.`)
-			process.exit(-1);
+			if (!liveEditorInstance && options.live) {
+				console.warn(`Couldn't find project ${options.live}.`)
+				process.exit(-1);
+			}
 		}
 	});
 
@@ -74,6 +89,7 @@ TesterBootstrap.prototype.apply = function(compiler) {
 
 module.exports = (env) => {
 	let outputPath = path.resolve(__dirname, "dist");
+	let devMode = ( env.mode == "development" ? true : false );
 
 	// Some versions of Webpack will fail if we don't have the output directory
 	// available before the build is initiated. So we'll create it here before it
@@ -83,7 +99,7 @@ module.exports = (env) => {
 	return {
 		mode: env.mode,
 		cache: false, // never cache, otherwise it will kill effectiveness of watch mode
-		watch: (env.liveEdit? true : false), // make sure to await file updates when previewing.
+		watch: ( env.liveEdit ? true : false), // make sure to await file updates when previewing.
 		//stats: "verbose",
 
 		entry: () => {
@@ -135,6 +151,15 @@ module.exports = (env) => {
 						"extract-loader", // leaves file without js module entry
 						"css-loader",
 						{
+							// HOLY CRAP THANK YOU CLEAN CSS!
+							loader: "clean-css-loader",
+							options: {
+								format: (devMode ? "beautify" : undefined),
+								inline: [(devMode ? "none" : "local")],
+								level: 2,
+							}
+						},
+						{
 							loader: "less-loader",
 							options: {
 								noIeCompat: true
@@ -151,26 +176,20 @@ module.exports = (env) => {
 			new TesterBootstrap({
 				live: env.liveEdit,
 				outputPath: outputPath
-			})
+			}),
 		],
 
 		optimization: {
 			minimizer: [
-				//new OptimizeCSSAssetsPlugin({})
+				/* NOTE: when webpack 5 comes out try and refurbish this.
+				 *
+				new OptimizeCSSAssetsPlugin({
+					cssProcessorPluginOptions: {
+						preset: ['default', { discardComments: { removeAll: true } }],
+					},
+				}),
+				*/
 			],
-			splitChunks: {
-				cacheGroups: {
-					vendors: {
-						priority: -10,
-						test: /[\\/]node_modules[\\/]/
-					}
-				},
-
-				chunks: 'async',
-				minChunks: 1,
-				minSize: 30000,
-				name: true
-			}
 		}
 	};
 };

@@ -14,14 +14,13 @@ let parser = new argparse.ArgumentParser({
 	description: 'qt-styles\' project build system.',
 });
 parser.addArgument(['-P'],{
-	help: 'Sets the running mode to production from development.',
+	help: 'Sets the running mode to production and minimizes output stylesheets.',
 	action: 'storeTrue',
 	default: false,
 });
 parser.addArgument(['--live'],{
 	help: 'Loads TEST project specified in a live stylesheet test window with file watching.',
 	action: 'store',
-	default: null,
 });
 
 // (OLD: FOR ANY ARGUMENT WITH MULTIPLE CHILDREN / action == append or nargs == + || *)
